@@ -2,7 +2,7 @@
   <v-container>
     <v-app-bar color="primary accent-4" dark app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>病历培训平台</v-toolbar-title>
+      <v-toolbar-title>病理培训平台</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
