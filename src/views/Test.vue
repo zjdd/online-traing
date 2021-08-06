@@ -1,10 +1,10 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col sm="10" md="6" xl="6" lg="6">
+      <v-col sm="12" md="6" xl="6" lg="6">
         <v-img lazy-src="../assets/test.jpg" src="../assets/test.jpg"></v-img>
       </v-col>
-      <v-col>
+      <v-col sm="12" md="4" xl="4" lg="4">
         <p>{{ question_text }}</p>
         <v-radio-group v-model="selected_value">
           <v-radio
@@ -17,10 +17,9 @@
           >
           </v-radio>
         </v-radio-group>
+        <v-divider />
+        <p v-show="done">答案是{{ answer_value }}</p>
       </v-col>
-    </v-row>
-    <v-row>
-      <p v-show="done">答案是{{ answer_value }}</p>
     </v-row>
   </v-container>
 </template>
@@ -55,6 +54,7 @@ export default {
     };
   },
   methods: {
+    load_question() {},
     show_answer() {
       this.done = true;
       if (this.selected_value === this.answer_value) {
