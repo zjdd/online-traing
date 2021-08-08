@@ -1,7 +1,8 @@
 "use strict";
-
 import Vue from "vue";
 import axios from "axios";
+import store from "../store";
+import router from "../router";
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
@@ -20,6 +21,10 @@ const _axios = axios.create(config);
 _axios.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    let token = store.state.token;
+    if (token) {
+      config.headers.Authorization = "Bearer " + token;
+    }
     return config;
   },
   function (error) {
@@ -36,6 +41,10 @@ _axios.interceptors.response.use(
   },
   function (error) {
     // Do something with response error
+    if (error.response && error.response.status === 401 && !store.state.token) {
+      store.commit("del_token");
+      router.push("/login").then(() => {});
+    }
     return Promise.reject(error);
   }
 );

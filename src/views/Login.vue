@@ -89,6 +89,7 @@ export default {
       },
     };
   },
+  mounted() {},
   methods: {
     login() {
       if (!!this.login_form.username && !!this.login_form.password) {
@@ -103,11 +104,9 @@ export default {
           })
           .catch((e) => {
             if (e.response) {
-              console.log(e.response);
-              if (e.response.status === 401) {
-                console.log("wrong passwd");
-                this.loading = false;
-              }
+              if (e.response.status === 401) alert("用户名或密码错误");
+              else alert("登陆失败");
+              this.loading = false;
             }
           });
       }
