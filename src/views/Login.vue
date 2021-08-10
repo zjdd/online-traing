@@ -10,7 +10,6 @@
           transition="scale-transition"
           width="40"
         />
-
         <v-img
           alt="Vuetify Name"
           class="shrink mt-1 hidden-sm-and-down"
@@ -95,7 +94,7 @@ export default {
       if (!!this.login_form.username && !!this.login_form.password) {
         this.loading = true;
         this.$axios
-          .post("/api/auth/token", qs.stringify(this.login_form))
+          .post("/auth/token", qs.stringify(this.login_form))
           .then((res) => {
             if (res.status === 200) {
               this.$store.commit("set_token", res.data["access_token"]);
