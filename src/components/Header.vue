@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-app-bar color="primary accent-4" dark app>
+    <v-app-bar color="primary accent-4" dark app clipped-right>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>病理培训平台</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -14,7 +14,7 @@
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-navigation-drawer v-model="drawer" absolute temporary app>
+    <v-navigation-drawer v-model="drawer" temporary app clipped>
       <v-list nav dense>
         <v-list-item-group v-model="group" active-class="primary--text">
           <v-list-item>

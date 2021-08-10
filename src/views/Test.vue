@@ -7,7 +7,13 @@
           lazy-src="../assets/test.jpg"
           :src="question_img_url"
         ></v-img>
-        <v-carousel hide-delimiters v-show="done" height="auto">
+        <v-carousel
+          hide-delimiters
+          transition="fade-transition"
+          reverse-transition="fade-transition"
+          v-show="done"
+          height="auto"
+        >
           <v-carousel-item>
             <v-img
               lazy-src="../assets/test.jpg"
