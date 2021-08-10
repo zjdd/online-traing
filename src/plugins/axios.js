@@ -12,7 +12,7 @@ import router from "../router";
 let config = {
   // baseURL: process.env.baseURL || process.env.apiUrl || ""
   // baseURL: "http://0.0.0.0:8000",
-  baseURL: "http://127.0.0.1:8001/api",
+  baseURL: "http://39.100.80.45/api1",
   timeout: 10 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };
