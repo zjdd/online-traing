@@ -1,6 +1,10 @@
 <template>
   <v-container>
-    <info-card v-for="i in 12" :key="i" />
+    <v-row justify="center" v-for="i in 3" :key="i">
+      <v-col cols="12" sm="12" md="6" xl="6" lg="6">
+        <info-card />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

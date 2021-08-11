@@ -11,7 +11,7 @@
         <v-icon>mdi-filter</v-icon>
       </v-btn>
       <v-btn icon>
-        <v-icon>mdi-dots-vertical</v-icon>
+        <v-icon>mdi-account</v-icon>
       </v-btn>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" temporary app clipped>
