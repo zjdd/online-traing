@@ -25,8 +25,9 @@ _axios.interceptors.request.use(
     let token = store.state.token;
     if (!token) {
       token = sessionStorage.getItem("token");
-      store.commit("set_token", token);
+      if (token) store.commit("set_token", token);
     }
+    console.log(token);
     if (token) {
       config.headers.Authorization = "Bearer " + token;
     }
@@ -46,7 +47,7 @@ _axios.interceptors.response.use(
   },
   function (error) {
     // Do something with response error
-    if (error.response && error.response.status === 401 && !store.state.token) {
+    if (error.response && error.response.status === 401) {
       store.commit("del_token");
       router.push("/login").then(() => {});
     }

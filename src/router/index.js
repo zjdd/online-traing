@@ -10,6 +10,11 @@ Vue.use(VueRouter);
 
 const routes = [
   {
+    path: "/",
+    name: "Train",
+    component: Train,
+  },
+  {
     path: "/home",
     name: "Home",
     component: Home,
@@ -49,9 +54,9 @@ router.beforeEach((to, from, next) => {
     let token = store.state.token;
     if (!token) {
       token = sessionStorage.getItem("token");
-      store.commit("set_token", token);
+      if (token) store.commit("set_token", token);
     }
-    if (token !== "") {
+    if (token) {
       next();
     } else {
       next({
