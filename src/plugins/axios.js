@@ -23,6 +23,10 @@ _axios.interceptors.request.use(
   function (config) {
     // Do something before request is sent
     let token = store.state.token;
+    if (!token) {
+      token = sessionStorage.getItem("token");
+      store.commit("set_token", token);
+    }
     if (token) {
       config.headers.Authorization = "Bearer " + token;
     }

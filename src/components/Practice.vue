@@ -8,24 +8,18 @@
             lazy-src="../assets/test.jpg"
             :src="question_img_url"
           ></v-img>
-          <v-carousel
-            hide-delimiters
-            transition="fade-transition"
-            reverse-transition="fade-transition"
-            v-show="done"
-            height="auto"
-          >
-            <v-carousel-item>
-              <v-img
-                lazy-src="../assets/test.jpg"
-                :src="question_img_url"
-              ></v-img>
+          <v-carousel hide-delimiters v-show="done" height="auto">
+            <v-carousel-item
+              reverse-transition="v-fade-transition"
+              transition="v-fade-transition"
+            >
+              <v-img :src="question_img_url"></v-img>
             </v-carousel-item>
-            <v-carousel-item>
-              <v-img
-                lazy-src="../assets/test.jpg"
-                :src="answer_img_url"
-              ></v-img>
+            <v-carousel-item
+              reverse-transition="v-fade-transition"
+              transition="v-fade-transition"
+            >
+              <v-img :src="answer_img_url"></v-img>
             </v-carousel-item>
           </v-carousel>
         </v-card>
@@ -42,6 +36,9 @@
               :value="option.value"
               :readonly="done"
             >
+            </v-radio>
+            <v-radio>
+              <span slot="label" style="color: thistle">My label</span>
             </v-radio>
           </v-radio-group>
           <v-divider v-show="done" />

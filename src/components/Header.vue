@@ -15,16 +15,15 @@
       </v-btn>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" temporary app clipped>
-      <v-list nav dense>
-        <v-list-item-group v-model="group" active-class="primary--text">
-          <v-list-item>
-            <v-list-item-title>我的</v-list-item-title>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title>培训</v-list-item-title>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title>测试</v-list-item-title>
+      <v-list class="pt-0">
+        <v-list-item-group v-model="selected" active-class="primary--text">
+          <v-list-item v-for="(item, i) in items" :key="i" :to="item.to">
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
       </v-list>
@@ -37,21 +36,13 @@ export default {
   data() {
     return {
       drawer: false,
-      group: 0,
+      selected: 1,
+      items: [
+        { title: "训练", icon: "mdi-school", to: "/train" },
+        { title: "测试", icon: "mdi-ab-testing", to: "/test" },
+        { title: "我的", icon: "mdi-home", to: "/home" },
+      ],
     };
-  },
-  watch: {
-    group: {
-      handler(newValue) {
-        let tmp_map = {
-          0: "/home",
-          1: "/train",
-          2: "/test",
-        };
-        this.$router.push(tmp_map[newValue]);
-      },
-      immediate: true,
-    },
   },
 };
 </script>
