@@ -27,7 +27,6 @@ _axios.interceptors.request.use(
       token = sessionStorage.getItem("token");
       if (token) store.commit("set_token", token);
     }
-    console.log(token);
     if (token) {
       config.headers.Authorization = "Bearer " + token;
     }

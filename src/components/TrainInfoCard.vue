@@ -7,34 +7,34 @@
         <v-row justify="center">
           <v-col>
             <div class="text--primary">
-              已完成: {{ status.completed }}/{{ status.total }}
+              已完成: {{ count.completed }}/{{ count.total }}
             </div>
           </v-col>
           <v-col>
             <v-progress-circular
               rotate="-90"
-              :value="(status.completed / status.total) * 100"
+              :value="(count.completed / count.total) * 100"
             ></v-progress-circular>
           </v-col>
           <v-col>
             <div class="text--primary">
-              正确率: {{ status.correct }}/{{ status.completed }}
+              正确率: {{ count.correct }}/{{ count.completed }}
             </div>
           </v-col>
           <v-col>
             <v-progress-circular
               rotate="-90"
-              :value="(status.correct / status.completed) * 100"
+              :value="(count.correct / count.completed) * 100"
             ></v-progress-circular>
           </v-col>
           <v-spacer></v-spacer>
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-btn text color="primary accent-4" @click.stop="dialog = true">
+        <v-btn text color="primary accent-4" @click.stop="start_training">
           顺序练习
         </v-btn>
-        <v-btn text color="primary accent-4" @click="reveal = true">
+        <v-btn text color="primary accent-4" @click.stop="reveal = true">
           查看错题
         </v-btn>
         <v-spacer></v-spacer>
@@ -70,7 +70,7 @@
             <v-spacer></v-spacer>
           </v-toolbar>
           <div class="area-practice">
-            <Test />
+            <Test :question_list="question_list" />
           </div>
         </div>
       </v-card>
@@ -86,11 +86,14 @@ export default {
     return {
       show: false,
       dialog: false,
-      status: {
+      count: {
         total: 0,
         completed: 0,
         correct: 0,
       },
+      question_list: [],
+      wrong_list: [],
+      incomplete_list: [],
     };
   },
   mounted() {
@@ -100,11 +103,18 @@ export default {
     async load_status() {
       await this.axios.get("/train/status").then((res) => {
         if (res.status === 200) {
-          this.status.total = res.data["total"];
-          this.status.correct = res.data["correct"];
-          this.status.completed = res.data["correct"] + res.data["wrong"];
+          this.count.total = res.data["total"];
+          this.count.correct = res.data["correct"].length;
+          this.count.completed =
+            res.data["correct"].length + res.data["wrong"].length;
+          this.incomplete_list = res.data["incomplete"];
+          this.wrong_list = res.data["wrong"];
         }
       });
+    },
+    start_training() {
+      this.question_list = this.incomplete_list;
+      this.dialog = true;
     },
     quit_training() {
       this.dialog = false;
