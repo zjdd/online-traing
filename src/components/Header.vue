@@ -4,15 +4,7 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>病理培训平台</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-      <v-btn icon>
-        <v-icon>mdi-filter</v-icon>
-      </v-btn>
-      <v-btn icon>
-        <v-icon>mdi-account</v-icon>
-      </v-btn>
+      <AccountIconMenu v-if="logged_in" />
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" temporary app clipped>
       <v-list class="pt-0">
@@ -32,6 +24,7 @@
 </template>
 
 <script>
+import AccountIconMenu from "./AccountIconMenu";
 export default {
   data() {
     return {
@@ -43,6 +36,15 @@ export default {
         { title: "我的", icon: "mdi-home", to: "/home" },
       ],
     };
+  },
+  components: {
+    AccountIconMenu,
+  },
+  computed: {
+    logged_in() {
+      console.log(this.$store.state.token === "");
+      return !(this.$store.state.token === "");
+    },
   },
 };
 </script>

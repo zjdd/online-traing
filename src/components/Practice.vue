@@ -6,6 +6,40 @@
     persistent
     transition="dialog-bottom-transition"
   >
+    <v-navigation-drawer v-model="show_drawer" absolute temporary right>
+      <v-container>
+        <v-btn
+          outlined
+          depressed
+          max-width="36px"
+          v-for="i in complete_buffer.length"
+          :key="i"
+          :color="complete_buffer[i - 1].correct ? 'primary' : 'error'"
+          class="mx-1 my-1"
+          @click="
+            index_p = i - 1;
+            show_drawer = false;
+          "
+        >
+          <v-icon left v-show="index_p === i - 1"> mdi-pencil </v-icon>
+          {{ i }}
+        </v-btn>
+        <v-btn
+          v-if="index_q <= question_list.length - 1"
+          outlined
+          color="grey"
+          class="mx-1 my-2"
+          max-width="36px"
+          @click="
+            index_p = index_q + 1;
+            show_drawer = false;
+          "
+        >
+          <v-icon left v-show="index_p === index_q + 1"> mdi-pencil </v-icon>
+          {{ index_q + 2 }}
+        </v-btn>
+      </v-container>
+    </v-navigation-drawer>
     <v-card height="100%">
       <div style="display: flex; flex-direction: column; height: 100%">
         <v-toolbar dark color="secondary">
@@ -17,7 +51,7 @@
           <v-btn icon>
             <v-icon>mdi-cog</v-icon>
           </v-btn>
-          <v-btn icon>
+          <v-btn icon @click.stop="show_drawer = true">
             <v-icon>mdi-view-grid</v-icon>
           </v-btn>
         </v-toolbar>
@@ -99,6 +133,8 @@ export default {
   props: ["question_list", "dialog"],
   data() {
     return {
+      show_drawer: false,
+
       index_p: 0,
       index_q: -1,
       complete_buffer: [],
@@ -150,7 +186,8 @@ export default {
         });
 
       if (!this.is_new_question()) {
-        this.selected_value = this.complete_buffer[this.index_p];
+        this.selected_value =
+          this.complete_buffer[this.index_p]["selected_value"];
       }
     },
     async post_result() {
@@ -160,7 +197,11 @@ export default {
           selected_value: this.selected_value,
         };
         await this.axios.post("/train/post_result", data).then(() => {
-          this.complete_buffer.push(this.selected_value);
+          let tmp = {
+            selected_value: this.selected_value,
+            correct: this.selected_value === this.answer_value,
+          };
+          this.complete_buffer.push(tmp);
           ++this.index_q;
         });
       }
