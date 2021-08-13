@@ -1,8 +1,8 @@
 <template>
-  <v-container>
-    <v-card class="mx-auto">
+  <v-container class="px-0 py-0">
+    <v-card class="px-0">
       <v-card-title>癌细胞判断训练</v-card-title>
-      <v-card-subtitle>时间: 2021/08/05 - 2021/08/09</v-card-subtitle>
+      <v-card-subtitle>时间: 2021/08/05 - 2021/08/20</v-card-subtitle>
       <v-card-text>
         <v-row justify="center">
           <v-col>
@@ -24,7 +24,11 @@
           <v-col>
             <v-progress-circular
               rotate="-90"
-              :value="(count.correct / count.completed) * 100"
+              :value="
+                count.completed === 0
+                  ? 0
+                  : (count.correct / count.completed) * 100
+              "
             ></v-progress-circular>
           </v-col>
           <v-spacer></v-spacer>
@@ -61,34 +65,12 @@
         </div>
       </v-expand-transition>
     </v-card>
-    <v-dialog
-      v-model="dialog"
-      fullscreen
-      hide-overlay
-      persistent
-      transition="dialog-bottom-transition"
-    >
-      <v-card height="100%">
-        <div style="display: flex; flex-direction: column; height: 100%">
-          <v-toolbar dark color="secondary">
-            <v-btn icon dark @click.stop="quit_training">
-              <v-icon>mdi-arrow-left</v-icon>
-            </v-btn>
-            <v-toolbar-title>结束训练</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-cog</v-icon>
-            </v-btn>
-            <v-btn icon>
-              <v-icon>mdi-view-grid</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <div class="area-practice">
-            <Test :question_list="question_list" />
-          </div>
-        </div>
-      </v-card>
-    </v-dialog>
+    <Test
+      v-if="dialog"
+      :question_list="question_list"
+      :dialog="dialog"
+      @quit="quit_training"
+    />
   </v-container>
 </template>
 
@@ -128,7 +110,6 @@ export default {
       });
     },
     async start_training(review = false) {
-      await this.load_status();
       if (review) {
         this.question_list = this.wrong_list;
       } else {
@@ -140,10 +121,9 @@ export default {
         this.snackbar = true;
       }
     },
-    quit_training() {
-      this.question_list = [];
+    async quit_training() {
+      await this.load_status();
       this.dialog = false;
-      this.load_status();
     },
   },
   components: {
@@ -152,13 +132,13 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-.area-practice {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  flex-grow: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-</style>
+<!--<style scoped lang="scss">-->
+<!--.area-practice {-->
+<!--  width: 100%;-->
+<!--  height: 100%;-->
+<!--  position: relative;-->
+<!--  flex-grow: 1;-->
+<!--  overflow-y: auto;-->
+<!--  overflow-x: hidden;-->
+<!--}-->
+<!--</style>-->
