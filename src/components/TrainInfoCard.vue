@@ -31,12 +31,20 @@
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-btn text color="primary accent-4" @click.stop="start_training">
+        <v-btn text color="primary accent-4" @click.stop="start_training()">
           顺序练习
         </v-btn>
-        <v-btn text color="primary accent-4" @click.stop="reveal = true">
+        <v-btn text color="primary accent-4" @click.stop="start_training(true)">
           查看错题
         </v-btn>
+        <v-snackbar v-model="snackbar" :timeout="2000">
+          已完成所有题目
+          <template v-slot:action="{ attrs }">
+            <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
+              关闭
+            </v-btn>
+          </template>
+        </v-snackbar>
         <v-spacer></v-spacer>
 
         <v-btn icon @click="show = !show">
@@ -68,6 +76,12 @@
             </v-btn>
             <v-toolbar-title>结束训练</v-toolbar-title>
             <v-spacer></v-spacer>
+            <v-btn icon>
+              <v-icon>mdi-cog</v-icon>
+            </v-btn>
+            <v-btn icon>
+              <v-icon>mdi-view-grid</v-icon>
+            </v-btn>
           </v-toolbar>
           <div class="area-practice">
             <Test :question_list="question_list" />
@@ -86,6 +100,7 @@ export default {
     return {
       show: false,
       dialog: false,
+      snackbar: false,
       count: {
         total: 0,
         completed: 0,
@@ -103,7 +118,7 @@ export default {
     async load_status() {
       await this.axios.get("/train/status").then((res) => {
         if (res.status === 200) {
-          this.count.total = res.data["total"];
+          this.count.total = res.data["total_count"];
           this.count.correct = res.data["correct"].length;
           this.count.completed =
             res.data["correct"].length + res.data["wrong"].length;
@@ -112,11 +127,21 @@ export default {
         }
       });
     },
-    start_training() {
-      this.question_list = this.incomplete_list;
-      this.dialog = true;
+    async start_training(review = false) {
+      await this.load_status();
+      if (review) {
+        this.question_list = this.wrong_list;
+      } else {
+        this.question_list = this.incomplete_list;
+      }
+      if (this.question_list.length !== 0) {
+        this.dialog = true;
+      } else {
+        this.snackbar = true;
+      }
     },
     quit_training() {
+      this.question_list = [];
       this.dialog = false;
       this.load_status();
     },
