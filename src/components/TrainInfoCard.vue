@@ -2,7 +2,7 @@
   <v-container class="px-0 py-0">
     <v-card class="px-0">
       <v-card-title>癌细胞判断训练</v-card-title>
-      <v-card-subtitle>时间: 2021/08/05 - 2021/08/20</v-card-subtitle>
+      <v-card-subtitle>时间: 2021/08/15 - 2021/08/29</v-card-subtitle>
       <v-card-text>
         <v-row justify="center">
           <v-col>

@@ -7,47 +7,48 @@
       transition="dialog-bottom-transition"
     >
       <v-card tile>
+        <v-dialog v-model="post_dialog" max-width="500">
+          <v-card>
+            <v-card-title class="text-h5"> 提交答案并退出测验 </v-card-title>
+            <v-card-text>
+              {{ post_card_text }}
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn color="primary" text @click="post_dialog = false">
+                取消
+              </v-btn>
+              <v-btn color="primary" text @click="quit_training"> 确定 </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
         <v-navigation-drawer v-model="show_drawer" app temporary right>
           <v-container>
             <v-btn
               outlined
               depressed
               max-width="36px"
-              v-for="i in complete_buffer.length"
+              v-for="i in question_list.length"
+              :color="selected_value[i - 1] === '#' ? 'gray' : 'primary'"
               :key="i"
-              :color="complete_buffer[i - 1].correct ? 'primary' : 'error'"
               class="mx-1 my-1"
               @click="
-                index_p = i - 1;
+                index = i - 1;
                 show_drawer = false;
               "
             >
-              <v-icon left v-show="index_p === i - 1"> mdi-pencil </v-icon>
+              <v-icon left v-show="index === i - 1"> mdi-pencil </v-icon>
               {{ i }}
-            </v-btn>
-            <v-btn
-              v-if="index_q < question_list.length - 1"
-              outlined
-              color="grey"
-              class="mx-1 my-2"
-              max-width="36px"
-              @click="
-                index_p = index_q + 1;
-                show_drawer = false;
-              "
-            >
-              <v-icon left v-show="index_p === index_q + 1">
-                mdi-pencil
-              </v-icon>
-              {{ index_q + 2 }}
             </v-btn>
           </v-container>
         </v-navigation-drawer>
         <v-app-bar dark color="primary">
-          <v-btn icon dark @click.stop="quit_training">
+          <v-btn icon dark @click.stop="post_dialog = true">
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
-          <v-app-bar-title>结束训练</v-app-bar-title>
+          <v-app-bar-title>提交并退出(倒计时{{ mm }}:{{ ss }})</v-app-bar-title>
           <v-spacer></v-spacer>
           <!--          <v-btn icon>-->
           <!--            <v-icon>mdi-cog</v-icon>-->
@@ -70,47 +71,26 @@
               <v-col cols="12" sm="12" md="6" xl="6" lg="6">
                 <v-card>
                   <v-img
-                    v-show="!show_answer"
                     lazy-src="../assets/test.jpg"
                     :src="question_img_url"
                   />
-                  <v-carousel
-                    hide-delimiters
-                    v-show="show_answer"
-                    height="auto"
-                  >
-                    <v-carousel-item>
-                      <v-img :src="question_img_url" />
-                    </v-carousel-item>
-                    <v-carousel-item>
-                      <v-img :src="answer_img_url" />
-                    </v-carousel-item>
-                    <v-carousel-item>
-                      <v-img :src="question_img_url" />
-                    </v-carousel-item>
-                    <v-carousel-item>
-                      <v-img :src="answer_img_url" />
-                    </v-carousel-item>
-                  </v-carousel>
                 </v-card>
               </v-col>
               <v-col sm="12" md="6" xl="6" lg="6">
                 <v-card class="px-0 py-0 mx-0 my-0">
                   <v-card-title class="pb-0"> {{ question_text }}</v-card-title>
                   <v-card-text class="pb-0">
-                    <v-radio-group v-model="selected_value">
+                    <v-radio-group v-model="selected_value[index]">
                       <v-radio
                         v-for="(option, i) in options"
                         :key="i"
-                        :color="color"
-                        :readonly="show_answer"
                         :value="option.value"
                         :label="option.label"
                       >
                       </v-radio>
                     </v-radio-group>
                   </v-card-text>
-                  <v-card-actions v-show="show_answer">
+                  <v-card-actions>
                     <v-btn
                       text
                       color="primary accent-4"
@@ -127,12 +107,6 @@
                     </v-btn>
                     <v-spacer></v-spacer>
                   </v-card-actions>
-                  <v-expand-transition>
-                    <div v-show="show_answer">
-                      <v-divider></v-divider>
-                      <v-card-text>正确答案是{{ answer_value }}</v-card-text>
-                    </div>
-                  </v-expand-transition>
                 </v-card>
               </v-col>
             </v-row>
@@ -145,47 +119,58 @@
 
 <script>
 export default {
-  props: ["question_list", "dialog"],
+  props: ["test_id", "question_list", "dialog", "duration"],
   data() {
     return {
       show_drawer: false,
       snackbar: false,
+      post_dialog: false,
       snackbar_text: "",
 
-      index_p: 0,
-      index_q: -1,
-      complete_buffer: [],
+      index: 0,
+      selected_value: [],
+
+      time: 0,
+      start_time: "",
+      end_time: "",
 
       question_text: "",
       question_img_url: "",
       answer_img_url: "",
       options: [],
       answer_value: "",
-      selected_value: "",
-      show_answer: false,
     };
   },
   mounted() {
-    this.load_question();
+    this.selected_value = new Array(this.question_list.length).fill("#");
+    this.start_testing();
   },
   methods: {
+    start_testing() {
+      this.time = this.duration * 60;
+      this.start_time = new Date();
+      setInterval(this.countdown, 1000);
+    },
+    countdown() {
+      this.time--;
+    },
+    padding(num, length) {
+      return (Array(length).join("0") + num).slice(-length);
+    },
     load_prev_question() {
-      if (this.index_p === 0) {
+      if (this.index === 0) {
         this.snackbar_text = "已经是第一题";
         this.snackbar = true;
-      } else --this.index_p;
+      } else --this.index;
     },
     load_next_question() {
-      if (this.index_p === this.question_list.length - 1) {
+      if (this.index === this.question_list.length - 1) {
         this.snackbar_text = "已经是最后一题";
         this.snackbar = true;
-      } else ++this.index_p;
+      } else ++this.index;
     },
     async load_question() {
-      this.show_answer = false; // reset
-      this.selected_value = "";
-
-      let question_id = this.question_list[this.index_p];
+      let question_id = this.question_list[this.index];
       await this.axios
         .get("/question", {
           params: { question_id: question_id },
@@ -204,55 +189,45 @@ export default {
               this.$axios.defaults.baseURL + "/img/" + data["answer_img_token"];
           }
         });
-
-      if (!this.is_new_question()) {
-        this.selected_value =
-          this.complete_buffer[this.index_p]["selected_value"];
-      }
+      this.selected = this.selected_value[this.index];
     },
     async post_result() {
-      if (this.is_new_question()) {
-        let data = {
-          question_id: this.question_list[this.index_p],
-          selected_value: this.selected_value,
-        };
-        await this.axios.post("/train/post_result", data).then(() => {
-          let tmp = {
-            selected_value: this.selected_value,
-            correct: this.selected_value === this.answer_value,
-          };
-          this.complete_buffer.push(tmp);
-          ++this.index_q;
-        });
-      }
+      this.end_time = new Date();
+      let data = {
+        test_id: this.test_id,
+        selected_value: this.selected_value.join(""),
+        start_time: this.start_time.getTime(),
+        end_time: this.end_time.getTime(),
+      };
+      await this.axios.post("/tests/post_result", data);
     },
-    is_new_question() {
-      return !(this.index_p <= this.index_q);
-    },
-    quit_training() {
+    async quit_training() {
+      await this.post_result();
+      this.post_dialog = false;
       this.$emit("quit");
     },
   },
-  computed: {
-    color() {
-      if (this.show_answer && this.answer_value === this.selected_value)
-        return "primary";
-      else return "error";
-    },
-  },
   watch: {
-    selected_value: {
-      handler(newValue) {
-        if (newValue) {
-          this.post_result();
-          this.show_answer = true;
-        }
-      },
-    },
-    index_p: {
+    index: {
       handler() {
         this.load_question();
       },
+      immediate: true,
+    },
+  },
+  computed: {
+    ss() {
+      let ss = this.time % 60;
+      return this.padding(ss, 2);
+    },
+    mm() {
+      let mm = Math.floor(this.time / 60);
+      return this.padding(mm, 2);
+    },
+    post_card_text() {
+      if (this.selected_value.includes("#"))
+        return "检测到您还有尚未作答的题目，是否确定提交？";
+      else return "检测到您已经完成所有作答，是否确定提交？";
     },
   },
 };
